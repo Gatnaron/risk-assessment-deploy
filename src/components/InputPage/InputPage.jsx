@@ -9,14 +9,14 @@ const InputPage = () => {
 
     // Начальные параметры организации
     const initialOrgParams = {
-        St: 10,
-        Dr: 250,
-        Do: 10,
-        Rvp: 5,
-        Rom: 5,
-        Pt: 5,
-        N: 3,
-        t: 30
+        St: null,
+        Dr: null,
+        Do: null,
+        Rvp: null,
+        Rom: null,
+        Pt: null,
+        N: null,
+        t: null
     };
 
     // Начальные данные для ФХП
@@ -101,6 +101,14 @@ const InputPage = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        const requiredFields = ['St', 'Dr', 'Do', 'Rvp', 'Rom', 'Pt', 'N', 't'];
+        const missingFields = requiredFields.filter(field => orgParams[field] === null || orgParams[field] === '');
+
+        if (missingFields.length > 0) {
+            alert('Пожалуйста, заполните все обязательные поля');
+            return;
+        }
+
         // Сохранение данных в localStorage
         localStorage.setItem('orgParams', JSON.stringify(orgParams));
         localStorage.setItem('fhps', JSON.stringify(fhps));
@@ -127,7 +135,7 @@ const InputPage = () => {
             <Paper elevation={3} sx={{ p: 3 }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
                     <Typography variant="h4" align="center" gutterBottom>
-                        Оценка рисков ФХП
+                        Планирование внутренних проверок
                     </Typography>
                     <Button
                         variant="outlined"

@@ -3,7 +3,7 @@ import React from 'react';
 const ResourceCalculator = ({ orgParams, onChange }) => {
     return (
         <section className="org-params">
-            <h2>Параметры организации</h2>
+            <h2>Ресурсы</h2>
             <div className="form-row">
                 <label>
                     Количество сотрудников (St):
