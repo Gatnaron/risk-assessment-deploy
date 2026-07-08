@@ -4,13 +4,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { calculateXS, calculateYS, calculateKS } from '../../utils/calculations';
 
-const FHPItem = ({ fhp, title, onEdit, onDelete, index }) => {
+const FHPItem = ({ fhp, title, onEdit, onDelete, index, settings }) => {
     const xs = calculateXS([fhp])[0];
     const ys = calculateYS([fhp])[0];
     const z = xs + ys;
     const kS = calculateKS([fhp])[0];
 
-    // Функция для вычисления k с учетом пользовательских значений
     const calculateK = (kS, customKValues) => {
         if (customKValues) {
             if (kS <= 7) return customKValues.range1;
@@ -18,7 +17,6 @@ const FHPItem = ({ fhp, title, onEdit, onDelete, index }) => {
             return customKValues.range3;
         }
 
-        // Стандартные значения, если пользовательские не заданы
         if (kS <= 7) return 1;
         if (kS <= 14) return 1.25;
         return 1.5;
@@ -28,21 +26,19 @@ const FHPItem = ({ fhp, title, onEdit, onDelete, index }) => {
 
     return (
         <Card sx={{ mb: 2, position: 'relative' }}>
-            {/* Кнопка редактирования в правом верхнем углу */}
             <IconButton
                 aria-label="edit"
                 onClick={() => onEdit(index)}
                 sx={{
                     position: 'absolute',
                     top: 8,
-                    right: 50,
+                    right: 40,
                     zIndex: 10
                 }}
             >
                 <EditIcon />
             </IconButton>
 
-            {/* Кнопка удаления в правом верхнем углу */}
             <IconButton
                 aria-label="delete"
                 onClick={() => onDelete(index)}

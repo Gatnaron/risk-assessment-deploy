@@ -2,68 +2,226 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ResourceCalculator from '../common/ResourceCalculator';
 import FHPList from './FHPList';
+import SettingsModal from './SettingsModal';
 import {Button, Container, Paper, Typography, Box} from '@mui/material';
+import { safeLocalStorage } from '../../utils/localStorage';
+import { defaultSettings } from '../../utils/settings';
 
 const InputPage = () => {
     const navigate = useNavigate();
 
-    // Начальные параметры организации
-    const initialOrgParams = {
-        St: null,
-        Dr: null,
-        Do: null,
-        Rvp: null,
-        Rom: null,
-        Pt: null,
-        N: null,
-        t: null
-    };
-
-    // Начальные данные для ФХП
-    const calculateDefaultFHP = () => ({
-        // Вероятность нарушений (X1-X8)
-        X1: 0, X2: 0, X3: 0, X4: 0, X5: 0, X6: 0, X7: 0, X8: 0,
-        // Последствия нарушений (Y1-Y8)
-        Y1: 0, Y2: 0, Y3: 0, Y4: 0, Y5: 0, Y6: 0, Y7: 0, Y8: 0,
-        // Факторы сложности (k1-k7)
-        k1: 0, k2: 0, k3: 0, k4: 0, k5: 0, k6: 0, k7: 0
+    // Загрузка настроек из localStorage или использование стандартных
+    const [settings, setSettings] = useState(() => {
+        const savedSettings = safeLocalStorage.getItem('appSettings');
+        return savedSettings ? JSON.parse(savedSettings) : { ...defaultSettings };
     });
 
-    const [orgParams, setOrgParams] = useState(initialOrgParams);
-    const [fhps, setFhps] = useState([calculateDefaultFHP()]);
-    const [fhpTitles, setFhpTitles] = useState(['ФХП 1']);
+    // Начальные параметры организации
+    const initialOrgParams = {};
+    settings.orgParams.forEach(param => {
+        initialOrgParams[param.key] = null;
+    });
+
+    // Начальные данные для ФХП
+    const calculateDefaultFHP = () => {
+        const fhp = {};
+
+        // Добавляем X критерии
+        settings.probabilityCriteria.forEach(criterion => {
+            fhp[criterion.id] = 0;
+        });
+
+        // Добавляем Y критерии
+        settings.consequenceCriteria.forEach(criterion => {
+            fhp[criterion.id] = 0;
+        });
+
+        // Добавляем k критерии
+        settings.complexityCriteria.forEach(criterion => {
+            fhp[criterion.id] = 0;
+        });
+
+        // Добавляем usedSettings с текущими настройками
+        fhp.usedSettings = {
+            probabilityCriteria: settings.probabilityCriteria.map(c => ({...c})),
+            consequenceCriteria: settings.consequenceCriteria.map(c => ({...c})),
+            complexityCriteria: settings.complexityCriteria.map(c => ({...c}))
+        };
+
+        return fhp;
+    };
+
+    const [orgParams, setOrgParams] = useState(() => {
+        const savedOrgParams = safeLocalStorage.getItem('orgParams');
+        if (savedOrgParams) {
+            return JSON.parse(savedOrgParams);
+        }
+
+        // Создаем безопасную инициализацию, проверяя существование settings
+        if (!settings || !settings.orgParams) {
+            return {
+                St: null, Dr: null, Do: null, Rvp: null, Rom: null, Pt: null, N: null, t: null
+            };
+        }
+
+        const initialOrgParams = {};
+        settings.orgParams.forEach(param => {
+            initialOrgParams[param.key] = null;
+        });
+        return initialOrgParams;
+    });
+
+    const [fhps, setFhps] = useState(() => {
+        const savedFhps = safeLocalStorage.getItem('fhps');
+        if (savedFhps) {
+            const loadedFhps = JSON.parse(savedFhps);
+            const updatedFhps = loadedFhps.map(fhp => {
+                if (!fhp.usedSettings) {
+                    // Если usedSettings отсутствует, добавляем текущие настройки
+                    return {
+                        ...fhp,
+                        usedSettings: {
+                            probabilityCriteria: settings.probabilityCriteria.map(c => ({...c})),
+                            consequenceCriteria: settings.consequenceCriteria.map(c => ({...c})),
+                            complexityCriteria: settings.complexityCriteria.map(c => ({...c}))
+                        }
+                    };
+                }
+                return fhp;
+            });
+            return updatedFhps;
+        }
+
+        // Создаем безопасную функцию для инициализации
+        const calculateDefaultFHP = () => {
+            const fhp = {};
+
+            // Проверяем наличие всех необходимых данных
+            if (settings && settings.probabilityCriteria) {
+                settings.probabilityCriteria.forEach(criterion => {
+                    fhp[criterion.id] = 0;
+                });
+            } else {
+                // Стандартные значения, если settings не загружен
+                ['X1','X2','X3','X4','X5','X6','X7','X8'].forEach(key => {
+                    fhp[key] = 0;
+                });
+            }
+
+            if (settings && settings.consequenceCriteria) {
+                settings.consequenceCriteria.forEach(criterion => {
+                    fhp[criterion.id] = 0;
+                });
+            } else {
+                ['Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8'].forEach(key => {
+                    fhp[key] = 0;
+                });
+            }
+
+            if (settings && settings.complexityCriteria) {
+                settings.complexityCriteria.forEach(criterion => {
+                    fhp[criterion.id] = 0;
+                });
+            } else {
+                ['k1','k2','k3','k4','k5','k6','k7'].forEach(key => {
+                    fhp[key] = 0;
+                });
+            }
+
+            // Добавляем usedSettings с текущими настройками
+            fhp.usedSettings = {
+                probabilityCriteria: settings.probabilityCriteria.map(c => ({...c})),
+                consequenceCriteria: settings.consequenceCriteria.map(c => ({...c})),
+                complexityCriteria: settings.complexityCriteria.map(c => ({...c}))
+            };
+
+            return fhp;
+        };
+
+        return [calculateDefaultFHP()];
+    });
+
+    const [fhpTitles, setFhpTitles] = useState(() => {
+        const savedFhpTitles = safeLocalStorage.getItem('fhpTitles');
+        return savedFhpTitles ? JSON.parse(savedFhpTitles) : ['ФХП 1'];
+    });
+    const [showSettings, setShowSettings] = useState(false);
 
     // Загрузка данных из localStorage при инициализации
     useEffect(() => {
-        const savedOrgParams = localStorage.getItem('orgParams');
-        const savedFhps = localStorage.getItem('fhps');
-        const savedFhpTitles = localStorage.getItem('fhpTitles');
+        const savedOrgParams = safeLocalStorage.getItem('orgParams');
+        const savedFhps = safeLocalStorage.getItem('fhps');
+        const savedFhpTitles = safeLocalStorage.getItem('fhpTitles');
+        const savedSettings = safeLocalStorage.getItem('appSettings');
 
         if (savedOrgParams) {
             setOrgParams(JSON.parse(savedOrgParams));
         }
 
         if (savedFhps) {
-            setFhps(JSON.parse(savedFhps));
+            const loadedFhps = JSON.parse(savedFhps);
+            const updatedFhps = loadedFhps.map(fhp => {
+                if (fhp.usedSettings) {
+                    return {
+                        ...fhp,
+                        usedSettings: {
+                            probabilityCriteria: fhp.usedSettings.probabilityCriteria.map(c => ({...c})),
+                            consequenceCriteria: fhp.usedSettings.consequenceCriteria.map(c => ({...c})),
+                            complexityCriteria: fhp.usedSettings.complexityCriteria.map(c => ({...c}))
+                        }
+                    };
+                }
+                return fhp;
+            });
+            setFhps(updatedFhps);
         }
 
         if (savedFhpTitles) {
             setFhpTitles(JSON.parse(savedFhpTitles));
         }
+
+        if (savedSettings) {
+            const loadedSettings = JSON.parse(savedSettings);
+            setSettings(loadedSettings);
+
+            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: обновляем usedSettings для всех ФХП при загрузке настроек
+            setFhps(prevFhps => prevFhps.map(fhp => ({
+                ...fhp,
+                usedSettings: {
+                    probabilityCriteria: loadedSettings.probabilityCriteria.map(c => ({...c})),
+                    consequenceCriteria: loadedSettings.consequenceCriteria.map(c => ({...c})),
+                    complexityCriteria: loadedSettings.complexityCriteria.map(c => ({...c}))
+                }
+            })));
+        }
     }, []);
 
     // Сохранение данных в localStorage при изменении
     useEffect(() => {
-        localStorage.setItem('orgParams', JSON.stringify(orgParams));
+        safeLocalStorage.setItem('orgParams', JSON.stringify(orgParams));
     }, [orgParams]);
 
     useEffect(() => {
-        localStorage.setItem('fhps', JSON.stringify(fhps));
+        safeLocalStorage.setItem('fhps', JSON.stringify(fhps));
     }, [fhps]);
 
     useEffect(() => {
-        localStorage.setItem('fhpTitles', JSON.stringify(fhpTitles));
+        safeLocalStorage.setItem('fhpTitles', JSON.stringify(fhpTitles));
     }, [fhpTitles]);
+
+    useEffect(() => {
+        safeLocalStorage.setItem('appSettings', JSON.stringify(settings));
+
+        // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: обновляем usedSettings для всех ФХП при изменении настроек
+        setFhps(prevFhps => prevFhps.map(fhp => ({
+            ...fhp,
+            usedSettings: {
+                probabilityCriteria: settings.probabilityCriteria.map(c => ({...c})),
+                consequenceCriteria: settings.consequenceCriteria.map(c => ({...c})),
+                complexityCriteria: settings.complexityCriteria.map(c => ({...c}))
+            }
+        })));
+    }, [settings]);
 
     const handleOrgParamChange = (key, value) => {
         setOrgParams(prev => ({
@@ -101,8 +259,10 @@ const InputPage = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const requiredFields = ['St', 'Dr', 'Do', 'Rvp', 'Rom', 'Pt', 'N', 't'];
-        const missingFields = requiredFields.filter(field => orgParams[field] === null || orgParams[field] === '');
+        const requiredFields = Object.keys(initialOrgParams);
+        const missingFields = requiredFields.filter(field =>
+            orgParams[field] === null || orgParams[field] === ''
+        );
 
         if (missingFields.length > 0) {
             alert('Пожалуйста, заполните все обязательные поля');
@@ -110,9 +270,9 @@ const InputPage = () => {
         }
 
         // Сохранение данных в localStorage
-        localStorage.setItem('orgParams', JSON.stringify(orgParams));
-        localStorage.setItem('fhps', JSON.stringify(fhps));
-        localStorage.setItem('fhpTitles', JSON.stringify(fhpTitles));
+        safeLocalStorage.setItem('orgParams', JSON.stringify(orgParams));
+        safeLocalStorage.setItem('fhps', JSON.stringify(fhps));
+        safeLocalStorage.setItem('fhpTitles', JSON.stringify(fhpTitles));
 
         // Переход на страницу результатов
         navigate('/results');
@@ -121,13 +281,27 @@ const InputPage = () => {
     const handleClearMemory = () => {
         if (window.confirm("Вы уверены, что хотите очистить все данные? Это действие нельзя отменить.")) {
             // Очищаем localStorage
-            localStorage.clear();
+            safeLocalStorage.clear();
 
             // Сбрасываем состояние к начальным значениям
             setOrgParams(initialOrgParams);
             setFhps([calculateDefaultFHP()]);
             setFhpTitles(['ФХП 1']);
+            setSettings({ ...defaultSettings });
         }
+    };
+
+    const openSettings = () => {
+        setShowSettings(true);
+    };
+
+    const closeSettings = () => {
+        setShowSettings(false);
+    };
+
+    const updateSettings = (newSettings) => {
+        setSettings(newSettings);
+        closeSettings();
     };
 
     return (
@@ -137,19 +311,29 @@ const InputPage = () => {
                     <Typography variant="h4" align="center" gutterBottom>
                         Планирование внутренних проверок
                     </Typography>
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={handleClearMemory}
-                    >
-                        Очистить память
-                    </Button>
+                    <Box>
+                        <Button
+                            variant="outlined"
+                            onClick={openSettings}
+                            sx={{ mr: 1 }}
+                        >
+                            Настройки
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            onClick={handleClearMemory}
+                        >
+                            Очистить память
+                        </Button>
+                    </Box>
                 </Box>
 
                 <form onSubmit={handleSubmit}>
                     <ResourceCalculator
                         orgParams={orgParams}
                         onChange={handleOrgParamChange}
+                        settings={settings}
                     />
 
                     <FHPList
@@ -158,6 +342,7 @@ const InputPage = () => {
                         onEditFHP={handleEditFHP}
                         onDeleteFHP={handleDeleteFHP}
                         fhpTitles={fhpTitles}
+                        settings={settings}
                     />
 
                     <Button
@@ -172,6 +357,13 @@ const InputPage = () => {
                     </Button>
                 </form>
             </Paper>
+
+            <SettingsModal
+                open={showSettings}
+                onClose={closeSettings}
+                settings={settings}
+                onSave={updateSettings}
+            />
         </Container>
     );
 };

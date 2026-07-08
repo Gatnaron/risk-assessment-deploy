@@ -11,8 +11,9 @@ import {
     MenuItem
 } from '@mui/material';
 import { calculateKS } from '../../utils/calculations';
+import { defaultSettings } from '../../utils/settings';
 
-const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title }) => {
+const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defaultSettings }) => {
     const [formData, setFormData] = useState({ ...fhp });
     const [kS, setKS] = useState(0);
     const [k, setK] = useState(1);
@@ -30,13 +31,24 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title }) => {
 
     // Обновляем данные при открытии модального окна
     useEffect(() => {
-        if (open) {
-            // Преобразуем все значения критериев в числа
+        if (open && settings) {
+            // Используем сохраненные настройки, если они есть, иначе текущие
+            const usedSettings = fhp.usedSettings || {
+                probabilityCriteria: settings.probabilityCriteria.map(c => ({...c})),
+                consequenceCriteria: settings.consequenceCriteria.map(c => ({...c})),
+                complexityCriteria: settings.complexityCriteria.map(c => ({...c}))
+            };
+
+            // Проверяем, что fhp содержит все необходимые поля
             const numericFhp = {...fhp};
-            ['X1','X2','X3','X4','X5','X6','X7','X8',
-                'Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8',
-                'k1','k2','k3','k4','k5','k6','k7'].forEach(key => {
-                if (numericFhp[key] !== undefined) {
+            const allKeys = [...Array(8).keys()].map(i => `X${i+1}`)
+                .concat([...Array(8).keys()].map(i => `Y${i+1}`))
+                .concat([...Array(7).keys()].map(i => `k${i+1}`));
+
+            allKeys.forEach(key => {
+                if (numericFhp[key] === undefined) {
+                    numericFhp[key] = 0; // Устанавливаем значение по умолчанию
+                } else {
                     numericFhp[key] = Number(numericFhp[key]);
                 }
             });
@@ -77,7 +89,7 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title }) => {
             setKS(calculatedKS);
             setK(calculateKFromKS(calculatedKS, newKValues));
         }
-    }, [open, fhp, title]);
+    }, [open, fhp, title, settings]);
 
     // Пересчитываем kS при изменении данных
     useEffect(() => {
@@ -137,6 +149,13 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title }) => {
             customKValues: kValues
         };
 
+        // ВСЕГДА сохраняем ТЕКУЩИЕ глобальные настройки в usedSettings
+        updatedFhp.usedSettings = {
+            probabilityCriteria: settings.probabilityCriteria.map(c => ({...c})),
+            consequenceCriteria: settings.consequenceCriteria.map(c => ({...c})),
+            complexityCriteria: settings.complexityCriteria.map(c => ({...c}))
+        };
+
         onSave(fhpTitle, updatedFhp);
         onClose();
     };
@@ -181,60 +200,88 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title }) => {
                 </FormControl>
 
                 <div className="modal-criteria">
-                    <h3>Критерии вероятности нарушений (X1-X8)</h3>
-                    <div className="criteria-grid">
-                        {['X1','X2','X3','X4','X5','X6','X7','X8'].map(key => (
-                            <FormControl key={key} fullWidth margin="dense">
-                                <InputLabel>{key}</InputLabel>
-                                <Select
-                                    value={formData[key]}
-                                    label={key}
-                                    onChange={(e) => handleChange(key, e.target.value)}
-                                >
-                                    <MenuItem value={0}>малозначимый</MenuItem>
-                                    <MenuItem value={1}>низкий</MenuItem>
-                                    <MenuItem value={2}>средний</MenuItem>
-                                    <MenuItem value={3}>высокий</MenuItem>
-                                </Select>
-                            </FormControl>
-                        ))}
-                    </div>
+                    {['X', 'Y'].map(prefix => (
+                        <div key={prefix}>
+                            <h3>{prefix === 'X' ? 'Критерии вероятности нарушений' : 'Критерии последствий нарушений'} ({prefix}1-{prefix}8)</h3>
+                            <div className="criteria-grid">
+                                {Array.from({ length: 8 }).map((_, i) => {
+                                    const key = `${prefix}${i + 1}`;
+                                    // Используем сохраненные настройки, если они есть, иначе текущие
+                                    const usedSettings = fhp.usedSettings || settings;
 
-                    <h3>Критерии последствий нарушений (Y1-Y8)</h3>
-                    <div className="criteria-grid">
-                        {['Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8'].map(key => (
-                            <FormControl key={key} fullWidth margin="dense">
-                                <InputLabel>{key}</InputLabel>
-                                <Select
-                                    value={formData[key]}
-                                    label={key}
-                                    onChange={(e) => handleChange(key, e.target.value)}
-                                >
-                                    <MenuItem value={0}>малозначимый</MenuItem>
-                                    <MenuItem value={1}>низкий</MenuItem>
-                                    <MenuItem value={2}>средний</MenuItem>
-                                    <MenuItem value={3}>высокий</MenuItem>
-                                </Select>
-                            </FormControl>
-                        ))}
-                    </div>
+                                    // Проверяем, что usedSettings и нужные критерии существуют
+                                    const criteriaSection = usedSettings &&
+                                        usedSettings[`${prefix.toLowerCase()}Criteria`];
+                                    const criterion = criteriaSection &&
+                                    criteriaSection[i] &&
+                                    criteriaSection[i].name &&
+                                    criteriaSection[i].options
+                                        ? criteriaSection[i]
+                                        : {
+                                            name: key,
+                                            options: [
+                                                { value: 0, label: 'малозначимый' },
+                                                { value: 1, label: 'низкий' },
+                                                { value: 2, label: 'средний' },
+                                                { value: 3, label: 'высокий' }
+                                            ]
+                                        };
+
+                                    return (
+                                        <FormControl key={key} fullWidth margin="dense">
+                                            <InputLabel>{criterion.name}</InputLabel>
+                                            <Select
+                                                value={formData[key]}
+                                                label={criterion.name}
+                                                onChange={(e) => handleChange(key, e.target.value)}
+                                            >
+                                                {criterion.options && criterion.options.map(option => (
+                                                    <MenuItem key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
 
                     <h3>Факторы сложности (k1-k7)</h3>
                     <div className="criteria-grid">
-                        {['k1','k2','k3','k4','k5','k6','k7'].map(key => (
-                            <FormControl key={key} fullWidth margin="dense">
-                                <InputLabel>{key}</InputLabel>
-                                <Select
-                                    value={formData[key]}
-                                    label={key}
-                                    onChange={(e) => handleChange(key, e.target.value)}
-                                >
-                                    <MenuItem value={0}>стандартный</MenuItem>
-                                    <MenuItem value={2}>повышенный</MenuItem>
-                                    <MenuItem value={3}>высокий</MenuItem>
-                                </Select>
-                            </FormControl>
-                        ))}
+                        {Array.from({ length: 7 }).map((_, i) => {
+                            const key = `k${i + 1}`;
+                            // Добавлена проверка на существование всех необходимых свойств
+                            const criterion = settings && settings.complexityCriteria &&
+                            settings.complexityCriteria[i] && settings.complexityCriteria[i].name &&
+                            settings.complexityCriteria[i].options
+                                ? settings.complexityCriteria[i]
+                                : {
+                                    name: key,
+                                    options: [
+                                        { value: 0, label: 'стандартный' },
+                                        { value: 2, label: 'повышенный' },
+                                        { value: 3, label: 'высокий' }
+                                    ]
+                                };
+                            return (
+                                <FormControl key={key} fullWidth margin="dense">
+                                    <InputLabel>{criterion.name}</InputLabel>
+                                    <Select
+                                        value={formData[key]}
+                                        label={criterion.name}
+                                        onChange={(e) => handleChange(key, e.target.value)}
+                                    >
+                                        {criterion.options && criterion.options.map(option => (
+                                            <MenuItem key={option.value} value={option.value}>
+                                                {option.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            );
+                        })}
                     </div>
 
                     <div className="k-calculation" style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>

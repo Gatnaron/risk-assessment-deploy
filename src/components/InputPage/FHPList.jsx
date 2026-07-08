@@ -3,7 +3,7 @@ import FHPItem from './FHPItem';
 import FHPModal from './FHPModal';
 import { Button } from '@mui/material';
 
-const FHPList = ({ fhps, onAddFHP, onEditFHP, onDeleteFHP, fhpTitles }) => {
+const FHPList = ({ fhps, onAddFHP, onEditFHP, onDeleteFHP, fhpTitles, settings }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [currentFHPIndex, setCurrentFHPIndex] = useState(null);
 
@@ -57,6 +57,7 @@ const FHPList = ({ fhps, onAddFHP, onEditFHP, onDeleteFHP, fhpTitles }) => {
                     onSave={handleSave}
                     onDelete={handleDeleteFromModal}
                     title={fhpTitles[currentFHPIndex] || `ФХП ${currentFHPIndex + 1}`}
+                    settings={settings}
                 />
             )}
         </div>
