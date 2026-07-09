@@ -36,7 +36,7 @@ import {
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import { Document, Paragraph, Table as DocxTable, TableRow as DocxTableRow,
-    TableCell as DocxTableCell, WidthType, HeadingLevel, Packer, TextRun } from 'docx';
+    TableCell as DocxTableCell, WidthType, Packer } from 'docx';
 
 const ResultsPage = () => {
     const navigate = useNavigate();

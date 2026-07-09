@@ -13,6 +13,14 @@ import {
 import { calculateKS } from '../../utils/calculations';
 import { defaultSettings } from '../../utils/settings';
 
+const calculateKFromKS = (kS, values) => {
+    if (kS >= 7 && kS <= 11) return values.range1;
+    if (kS >= 12 && kS <= 16) return values.range2;
+    if (kS >= 17 && kS <= 21) return values.range3;
+
+    return null;
+};
+
 const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defaultSettings }) => {
     const [formData, setFormData] = useState({ ...fhp });
     const [kS, setKS] = useState(0);
@@ -94,15 +102,6 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
         setKS(calculatedKS);
         setK(calculateKFromKS(calculatedKS, kValues));
     }, [formData, kValues]);
-
-    // Функция для вычисления k на основе пользовательских значений
-    const calculateKFromKS = (kS, values = kValues) => {
-        if (kS >= 7 && kS <= 11) return values.range1;
-        if (kS >= 12 && kS <= 16) return values.range2;
-        if (kS >= 17 && kS <= 21) return values.range3;
-
-        return null;
-    };
 
     const handleChange = (key, value) => {
         // Преобразуем значение в число

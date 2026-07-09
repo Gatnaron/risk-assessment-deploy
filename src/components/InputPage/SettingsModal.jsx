@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Box, Typography, Button, TextField, FormControl, InputLabel, Select, MenuItem, Tabs, Tab, Grid, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Modal, Box, Typography, Button, TextField,  Tabs, Tab, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {defaultSettings} from "../../utils/settings";
 

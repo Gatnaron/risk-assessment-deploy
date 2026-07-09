@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter, Routes, Route, NavLink } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import InputPage from './components/InputPage/InputPage';
 import ResultsPage from './components/ResultsPage/ResultsPage';
 
