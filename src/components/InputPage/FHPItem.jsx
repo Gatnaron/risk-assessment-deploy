@@ -11,14 +11,19 @@ const FHPItem = ({ fhp, title, onEdit, onDelete, index, settings }) => {
     const kS = calculateKS([fhp])[0];
 
     const calculateK = (kS, customKValues) => {
-        if (customKValues) {
-            if (kS <= 7) return customKValues.range1;
-            if (kS <= 14) return customKValues.range2;
-            return customKValues.range3;
+        if (kS < 7 || kS > 21) {
+            return null;
         }
 
-        if (kS <= 7) return 1;
-        if (kS <= 14) return 1.25;
+        if (customKValues) {
+            if (kS >= 7 && kS <= 11) return customKValues.range1;
+            if (kS >= 12 && kS <= 16) return customKValues.range2;
+            if (kS >= 17 && kS <= 21) return customKValues.range3;
+        }
+
+        // Стандартные значения, если пользовательские не заданы
+        if (kS >= 7 && kS <= 11) return 1;
+        if (kS >= 12 && kS <= 16) return 1.25;
         return 1.5;
     };
 
@@ -75,12 +80,18 @@ const FHPItem = ({ fhp, title, onEdit, onDelete, index, settings }) => {
 
                 <Box display="flex" justifyContent="space-between" mb={1}>
                     <Typography variant="body2">Сложность проверки (kS):</Typography>
-                    <Typography variant="body2">{kS}</Typography>
+                    {/* Выделяем kS красным, если он вне допустимого диапазона */}
+                    <Typography
+                        variant="body2"
+                        sx={{ color: kS >= 7 && kS <= 21 ? 'inherit' : 'error.main' }}
+                    >
+                        {kS}
+                    </Typography>
                 </Box>
 
                 <Box display="flex" justifyContent="space-between" mb={1}>
                     <Typography variant="body2">Коэффициент сложности (k):</Typography>
-                    <Typography variant="body2">{k}</Typography>
+                    <Typography variant="body2">{k !== null ? k : 'Ошибка'}</Typography>
                 </Box>
             </CardContent>
         </Card>

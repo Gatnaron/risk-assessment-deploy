@@ -8,7 +8,7 @@ import {
     FormControl,
     InputLabel,
     Select,
-    MenuItem
+    MenuItem, Collapse, Alert
 } from '@mui/material';
 import { calculateKS } from '../../utils/calculations';
 import { defaultSettings } from '../../utils/settings';
@@ -28,16 +28,12 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
         range2: '1.25',
         range3: '1.5'
     });
+    const [error, setError] = useState(null);
+    const [showError, setShowError] = useState(false);
 
     // Обновляем данные при открытии модального окна
     useEffect(() => {
         if (open && settings) {
-            // Используем сохраненные настройки, если они есть, иначе текущие
-            const usedSettings = fhp.usedSettings || {
-                probabilityCriteria: settings.probabilityCriteria.map(c => ({...c})),
-                consequenceCriteria: settings.consequenceCriteria.map(c => ({...c})),
-                complexityCriteria: settings.complexityCriteria.map(c => ({...c}))
-            };
 
             // Проверяем, что fhp содержит все необходимые поля
             const numericFhp = {...fhp};
@@ -101,9 +97,11 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
 
     // Функция для вычисления k на основе пользовательских значений
     const calculateKFromKS = (kS, values = kValues) => {
-        if (kS <= 7) return values.range1;
-        if (kS <= 14) return values.range2;
-        return values.range3;
+        if (kS >= 7 && kS <= 11) return values.range1;
+        if (kS >= 12 && kS <= 16) return values.range2;
+        if (kS >= 17 && kS <= 21) return values.range3;
+
+        return null;
     };
 
     const handleChange = (key, value) => {
@@ -143,6 +141,18 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
     };
 
     const handleSave = () => {
+        if (kS < 7 || kS > 21) {
+            setError(`Значение kS (${kS}) должно быть в диапазоне от 7 до 21`);
+            setShowError(true);
+
+            // Скрываем сообщение об ошибке через 5 секунд
+            setTimeout(() => {
+                setShowError(false);
+            }, 5000);
+
+            return;
+        }
+
         const updatedFhp = {
             ...formData,
             k: k,
@@ -178,6 +188,8 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
         overflow: 'auto'
     };
 
+    const isKSValid = kS >= 7 && kS <= 21;
+
     return (
         <Modal
             open={open}
@@ -199,6 +211,7 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
                     />
                 </FormControl>
 
+
                 <div className="modal-criteria">
                     {['X', 'Y'].map(prefix => (
                         <div key={prefix}>
@@ -206,17 +219,14 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
                             <div className="criteria-grid">
                                 {Array.from({ length: 8 }).map((_, i) => {
                                     const key = `${prefix}${i + 1}`;
-                                    // Используем сохраненные настройки, если они есть, иначе текущие
-                                    const usedSettings = fhp.usedSettings || settings;
-
-                                    // Проверяем, что usedSettings и нужные критерии существуют
-                                    const criteriaSection = usedSettings &&
-                                        usedSettings[`${prefix.toLowerCase()}Criteria`];
-                                    const criterion = criteriaSection &&
-                                    criteriaSection[i] &&
-                                    criteriaSection[i].name &&
-                                    criteriaSection[i].options
-                                        ? criteriaSection[i]
+                                    // Используем ТЕКУЩИЕ настройки напрямую, как для k критериев
+                                    const criteriaType = prefix === 'X' ? 'probabilityCriteria' : 'consequenceCriteria';
+                                    const criterion = settings && settings[criteriaType] &&
+                                    Array.isArray(settings[criteriaType]) &&
+                                    settings[criteriaType][i] &&
+                                    settings[criteriaType][i].name &&
+                                    Array.isArray(settings[criteriaType][i].options)
+                                        ? settings[criteriaType][i]
                                         : {
                                             name: key,
                                             options: [
@@ -286,7 +296,9 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
 
                     <div className="k-calculation" style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
                         <h3>Коэффициент сложности (k)</h3>
-                        <p>Интегральный показатель сложности (kS): <strong>{kS}</strong></p>
+                        <p style={{ color: isKSValid ? 'inherit' : 'error.main' }}>
+                            Интегральный показатель сложности (kS): <strong>{kS}</strong>
+                        </p>
                         <p>Текущее значение k: <strong>{k}</strong></p>
 
                         <div style={{
@@ -296,41 +308,48 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
                             marginTop: '15px'
                         }}>
                             <TextField
-                                label="Значение для 0-7"
+                                label="Значение для 7-11"
                                 type="text"
                                 value={inputValues.range1}
                                 onChange={(e) => handleKValueChange('range1', e.target.value)}
                                 InputLabelProps={{ shrink: true }}
-                                helperText="Диапазон 0 ≤ kS ≤ 7"
+                                helperText="Диапазон 7 ≤ kS ≤ 11"
                             />
                             <TextField
-                                label="Значение для 8-14"
+                                label="Значение для 12-16"
                                 type="text"
                                 value={inputValues.range2}
                                 onChange={(e) => handleKValueChange('range2', e.target.value)}
                                 InputLabelProps={{ shrink: true }}
-                                helperText="Диапазон 8 ≤ kS ≤ 14"
+                                helperText="Диапазон 12 ≤ kS ≤ 16"
                             />
                             <TextField
-                                label="Значение для 15-21"
+                                label="Значение для 17-21"
                                 type="text"
                                 value={inputValues.range3}
                                 onChange={(e) => handleKValueChange('range3', e.target.value)}
                                 InputLabelProps={{ shrink: true }}
-                                helperText="Диапазон 15 ≤ kS ≤ 21"
+                                helperText="Диапазон 17 ≤ kS ≤ 21"
                             />
                         </div>
 
                         <div style={{ marginTop: '15px', fontSize: '0.9rem', color: '#666' }}>
                             <p><strong>Правила определения k:</strong></p>
                             <ul>
-                                <li>Если 0 ≤ kS ≤ 7, то k = {kValues.range1 === '' ? '—' : kValues.range1}</li>
-                                <li>Если 8 ≤ kS ≤ 14, то k = {kValues.range2 === '' ? '—' : kValues.range2}</li>
-                                <li>Если 15 ≤ kS ≤ 21, то k = {kValues.range3 === '' ? '—' : kValues.range3}</li>
+                                <li style={{ color: kS >= 7 && kS <= 11 ? 'inherit' : '#666' }}>Если 7 ≤ kS ≤ 11, то k = {kValues.range1 === '' ? '—' : kValues.range1}</li>
+                                <li style={{ color: kS >= 12 && kS <= 16 ? 'inherit' : '#666' }}>Если 12 ≤ kS ≤ 16, то k = {kValues.range2 === '' ? '—' : kValues.range2}</li>
+                                <li style={{ color: kS >= 17 && kS <= 21 ? 'inherit' : '#666' }}>Если 17 ≤ kS ≤ 21, то k = {kValues.range3 === '' ? '—' : kValues.range3}</li>
                             </ul>
                         </div>
                     </div>
                 </div>
+
+                {/* Отображаем сообщение об ошибке, если оно есть */}
+                <Collapse in={showError}>
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                </Collapse>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', gap: '10px' }}>
                     <Button variant="outlined" color="error" onClick={handleDelete}>

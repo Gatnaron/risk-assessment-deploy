@@ -2,7 +2,11 @@
 export const calculateXS = (fhps) => {
     return fhps.map(fhp => {
         const sum = ['X1','X2','X3','X4','X5','X6','X7','X8']
-            .reduce((acc, key) => acc + fhp[key], 0);
+            .reduce((acc, key) => {
+                // Проверяем, что значение существует и является числом
+                const value = fhp[key] !== undefined ? Number(fhp[key]) : 0;
+                return acc + (isNaN(value) ? 0 : value);
+            }, 0);
         return sum / 8;
     });
 };
@@ -11,7 +15,11 @@ export const calculateXS = (fhps) => {
 export const calculateYS = (fhps) => {
     return fhps.map(fhp => {
         const sum = ['Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8']
-            .reduce((acc, key) => acc + fhp[key], 0);
+            .reduce((acc, key) => {
+                // Проверяем, что значение существует и является числом
+                const value = fhp[key] !== undefined ? Number(fhp[key]) : 0;
+                return acc + (isNaN(value) ? 0 : value);
+            }, 0);
         return sum / 8;
     });
 };
@@ -24,22 +32,32 @@ export const calculateZ = (xs, ys) => {
 // Интегральный показатель сложности (kS)
 export const calculateKS = (fhps) => {
     return fhps.map(fhp => {
-        return ['k1','k2','k3','k4','k5','k6','k7']
-            .reduce((acc, key) => acc + fhp[key], 0);
+        const sum = ['k1', 'k2', 'k3', 'k4', 'k5', 'k6', 'k7']
+            .reduce((acc, key) => {
+                // Проверяем, что значение существует и является числом
+                const value = fhp[key] !== undefined ? Number(fhp[key]) : 0;
+                return acc + (isNaN(value) ? 0 : value);
+            }, 0);
+        return sum;
     });
 };
 
 // Коэффициент сложности (k) с учетом пользовательских значений
 export const calculateKWithCustomValues = (kS, customKValues) => {
+    // Проверяем, что kS находится в допустимом диапазоне
+    if (kS < 7 || kS > 21) {
+        return null;
+    }
+
     if (customKValues) {
-        if (kS <= 7) return customKValues.range1;
-        if (kS <= 14) return customKValues.range2;
-        return customKValues.range3;
+        if (kS >= 7 && kS <= 11) return customKValues.range1;
+        if (kS >= 12 && kS <= 16) return customKValues.range2;
+        if (kS >= 17 && kS <= 21) return customKValues.range3;
     }
 
     // Стандартные значения, если пользовательские не заданы
-    if (kS <= 7) return 1;
-    if (kS <= 14) return 1.25;
+    if (kS >= 7 && kS <= 11) return 1;
+    if (kS >= 12 && kS <= 16) return 1.25;
     return 1.5;
 };
 

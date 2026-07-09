@@ -330,18 +330,18 @@ const InputPage = () => {
                 </Box>
 
                 <form onSubmit={handleSubmit}>
-                    <ResourceCalculator
-                        orgParams={orgParams}
-                        onChange={handleOrgParamChange}
-                        settings={settings}
-                    />
-
                     <FHPList
                         fhps={fhps}
                         onAddFHP={handleAddFHP}
                         onEditFHP={handleEditFHP}
                         onDeleteFHP={handleDeleteFHP}
                         fhpTitles={fhpTitles}
+                        settings={settings}
+                    />
+
+                    <ResourceCalculator
+                        orgParams={orgParams}
+                        onChange={handleOrgParamChange}
                         settings={settings}
                     />
 
