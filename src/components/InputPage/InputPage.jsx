@@ -38,7 +38,7 @@ const InputPage = () => {
 
         // Добавляем k критерии
         settings.complexityCriteria.forEach(criterion => {
-            fhp[criterion.id] = 0;
+            fhp[criterion.id] = 1;
         });
 
         // Добавляем usedSettings с текущими настройками
@@ -124,7 +124,7 @@ const InputPage = () => {
                 });
             } else {
                 ['k1','k2','k3','k4','k5','k6','k7'].forEach(key => {
-                    fhp[key] = 0;
+                    fhp[key] = 1;
                 });
             }
 

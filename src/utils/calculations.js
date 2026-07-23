@@ -35,8 +35,8 @@ export const calculateKS = (fhps) => {
         const sum = ['k1', 'k2', 'k3', 'k4', 'k5', 'k6', 'k7']
             .reduce((acc, key) => {
                 // Проверяем, что значение существует и является числом
-                const value = fhp[key] !== undefined ? Number(fhp[key]) : 0;
-                return acc + (isNaN(value) ? 0 : value);
+                const value = fhp[key] !== undefined ? Number(fhp[key]) : 1;
+                return acc + (isNaN(value) ? 1 : value);
             }, 0);
         return sum;
     });

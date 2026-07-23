@@ -27,9 +27,9 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
     const [k, setK] = useState(1);
     const [fhpTitle, setFhpTitle] = useState(title || `ФХП ${Date.now()}`);
     const [kValues, setKValues] = useState({
-        range1: 1,  // Для диапазона 0-7
-        range2: 1.25,  // Для диапазона 8-14
-        range3: 1.5  // Для диапазона 15-21
+        range1: 1,
+        range2: 1.25,
+        range3: 1.5
     });
     const [inputValues, setInputValues] = useState({
         range1: '1',
@@ -51,7 +51,11 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
 
             allKeys.forEach(key => {
                 if (numericFhp[key] === undefined) {
-                    numericFhp[key] = 0; // Устанавливаем значение по умолчанию
+                    if (key.startsWith('k')) {
+                        numericFhp[key] = 1;
+                    } else {
+                        numericFhp[key] = 0;
+                    }
                 } else {
                     numericFhp[key] = Number(numericFhp[key]);
                 }
@@ -269,7 +273,7 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
                                 : {
                                     name: key,
                                     options: [
-                                        { value: 0, label: 'стандартный' },
+                                        { value: 1, label: 'стандартный' },
                                         { value: 2, label: 'повышенный' },
                                         { value: 3, label: 'высокий' }
                                     ]

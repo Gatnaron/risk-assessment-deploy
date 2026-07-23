@@ -80,7 +80,6 @@ const FHPItem = ({ fhp, title, onEdit, onDelete, index, settings }) => {
 
                 <Box display="flex" justifyContent="space-between" mb={1}>
                     <Typography variant="body2">Сложность проверки (kS):</Typography>
-                    {/* Выделяем kS красным, если он вне допустимого диапазона */}
                     <Typography
                         variant="body2"
                         sx={{ color: kS >= 7 && kS <= 21 ? 'inherit' : 'error.main' }}

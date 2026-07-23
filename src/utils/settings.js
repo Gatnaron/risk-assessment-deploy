@@ -170,7 +170,7 @@ export const defaultSettings = {
             id: 'k1',
             name: 'k1',
             options: [
-                { value: 0, label: 'стандартный' },
+                { value: 1, label: 'стандартный' },
                 { value: 2, label: 'повышенный' },
                 { value: 3, label: 'высокий' }
             ]
@@ -179,7 +179,7 @@ export const defaultSettings = {
             id: 'k2',
             name: 'k2',
             options: [
-                { value: 0, label: 'стандартный' },
+                { value: 1, label: 'стандартный' },
                 { value: 2, label: 'повышенный' },
                 { value: 3, label: 'высокий' }
             ]
@@ -188,7 +188,7 @@ export const defaultSettings = {
             id: 'k3',
             name: 'k3',
             options: [
-                { value: 0, label: 'стандартный' },
+                { value: 1, label: 'стандартный' },
                 { value: 2, label: 'повышенный' },
                 { value: 3, label: 'высокий' }
             ]
@@ -197,7 +197,7 @@ export const defaultSettings = {
             id: 'k4',
             name: 'k4',
             options: [
-                { value: 0, label: 'стандартный' },
+                { value: 1, label: 'стандартный' },
                 { value: 2, label: 'повышенный' },
                 { value: 3, label: 'высокий' }
             ]
@@ -206,7 +206,7 @@ export const defaultSettings = {
             id: 'k5',
             name: 'k5',
             options: [
-                { value: 0, label: 'стандартный' },
+                { value: 1, label: 'стандартный' },
                 { value: 2, label: 'повышенный' },
                 { value: 3, label: 'высокий' }
             ]
@@ -215,7 +215,7 @@ export const defaultSettings = {
             id: 'k6',
             name: 'k6',
             options: [
-                { value: 0, label: 'стандартный' },
+                { value: 1, label: 'стандартный' },
                 { value: 2, label: 'повышенный' },
                 { value: 3, label: 'высокий' }
             ]
@@ -224,7 +224,7 @@ export const defaultSettings = {
             id: 'k7',
             name: 'k7',
             options: [
-                { value: 0, label: 'стандартный' },
+                { value: 1, label: 'стандартный' },
                 { value: 2, label: 'повышенный' },
                 { value: 3, label: 'высокий' }
             ]
