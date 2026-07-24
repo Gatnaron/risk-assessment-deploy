@@ -13,7 +13,7 @@ import {
 import { calculateKS } from '../../utils/calculations';
 import { defaultSettings } from '../../utils/settings';
 
-const calculateKFromKS = (kS, values) => {
+const calculateKFromKS = (kS, values = kValues) => {
     if (kS >= 7 && kS <= 11) return values.range1;
     if (kS >= 12 && kS <= 16) return values.range2;
     if (kS >= 17 && kS <= 21) return values.range3;
