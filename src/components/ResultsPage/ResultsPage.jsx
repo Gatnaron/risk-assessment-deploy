@@ -44,15 +44,21 @@ const ResultsPage = () => {
     const [fhpTitles, setFhpTitles] = useState([]);
     const [expanded, setExpanded] = useState(false);
     const [exportModalOpen, setExportModalOpen] = useState(false);
+    const [settings, setSettings] = useState(null);
 
     useEffect(() => {
         const orgParams = JSON.parse(localStorage.getItem('orgParams'));
         const fhps = JSON.parse(localStorage.getItem('fhps'));
         const titles = JSON.parse(localStorage.getItem('fhpTitles')) || [];
+        const savedSettings = JSON.parse(localStorage.getItem('appSettings'));
 
         if (!orgParams || !fhps) {
             navigate('/');
             return;
+        }
+
+        if (savedSettings) {
+            setSettings(savedSettings);
         }
 
         // Расчеты
@@ -256,7 +262,7 @@ const ResultsPage = () => {
                                         width: { size: 20, type: WidthType.PERCENTAGE }
                                     }),
                                     new DocxTableCell({
-                                        children: [new Paragraph({ text: "Z", style: "heading2" })],
+                                        children: [new Paragraph({ text: "R", style: "heading2" })],
                                         width: { size: 10, type: WidthType.PERCENTAGE }
                                     }),
                                     new DocxTableCell({
@@ -268,7 +274,7 @@ const ResultsPage = () => {
                                         width: { size: 10, type: WidthType.PERCENTAGE }
                                     }),
                                     new DocxTableCell({
-                                        children: [new Paragraph({ text: "k", style: "heading2" })],
+                                        children: [new Paragraph({ text: "Con", style: "heading2" })],
                                         width: { size: 10, type: WidthType.PERCENTAGE }
                                     }),
                                     new DocxTableCell({
@@ -365,6 +371,64 @@ const ResultsPage = () => {
 
     return (
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Box
+                sx={{
+                    position: 'fixed',
+                    right: 20,
+                    top: 100,
+                    width: 300,
+                    bgcolor: 'background.paper',
+                    boxShadow: 3,
+                    borderRadius: 2,
+                    p: 2,
+                    maxHeight: 'calc(100vh - 120px)',
+                    overflow: 'auto',
+                    zIndex: 1000
+                }}
+            >
+                <Typography variant="h6" gutterBottom sx={{ mb: 2, borderBottom: 1, borderColor: 'divider', pb: 1 }}>
+                    Параметры организации
+                </Typography>
+                <Box component="ul" sx={{ listStyle: 'none', p: 0, m: 0 }}>
+                    {settings?.orgParams?.map((param) => (
+                        <Box
+                            key={param.key}
+                            component="li"
+                            sx={{
+                                mb: 1.5,
+                                pb: 1,
+                                borderBottom: '1px solid #f0f0f0',
+                                '&:last-child': { borderBottom: 'none' }
+                            }}
+                        >
+                            <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                gutterBottom
+                                sx={{
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    whiteSpace: 'normal',
+                                    lineHeight: 1.3
+                                }}
+                            >
+                                {param.name}
+                            </Typography>
+                            <Typography
+                                variant="body1"
+                                fontWeight="bold"
+                                sx={{
+                                    wordWrap: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    whiteSpace: 'normal'
+                                }}
+                            >
+                                {orgParams[param.key]}
+                            </Typography>
+                        </Box>
+                    ))}
+                </Box>
+            </Box>
             <Paper elevation={3} sx={{ p: 3 }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
                     <Typography variant="h4">Результаты оценки</Typography>
@@ -404,7 +468,7 @@ const ResultsPage = () => {
                                 <Typography variant="h6">{fhpTitles[item.index] || `ФХП ${item.index + 1}`}</Typography>
                                 <Box>
                                     <Typography component="span" sx={{ mr: 2 }}>
-                                        <strong>Уровень риска (Z):</strong> {item.z.toFixed(2)}
+                                        <strong>Уровень риска (R):</strong> {item.z.toFixed(2)}
                                     </Typography>
                                     <Typography component="span">
                                         <strong>Трудоемкость (T):</strong> {item.t} чел-дн
@@ -418,9 +482,9 @@ const ResultsPage = () => {
                                     <Card variant="outlined">
                                         <CardContent>
                                             <Typography variant="h6" gutterBottom>Оценка риска</Typography>
-                                            <Typography><strong>XS</strong> = {item.xs.toFixed(2)}</Typography>
-                                            <Typography><strong>YS</strong> = {item.ys.toFixed(2)}</Typography>
-                                            <Typography><strong>Z</strong> = {item.z.toFixed(2)}</Typography>
+                                            <Typography><strong>PS</strong> = {item.xs.toFixed(2)}</Typography>
+                                            <Typography><strong>CS</strong> = {item.ys.toFixed(2)}</Typography>
+                                            <Typography><strong>R</strong> = {item.z.toFixed(2)}</Typography>
                                         </CardContent>
                                     </Card>
                                 </Grid>
@@ -428,8 +492,8 @@ const ResultsPage = () => {
                                     <Card variant="outlined">
                                         <CardContent>
                                             <Typography variant="h6" gutterBottom>Оценка сложности проверки</Typography>
-                                            <Typography><strong>kS</strong> = {item.kS}</Typography>
-                                            <Typography><strong>k</strong> = {item.k}</Typography>
+                                            <Typography><strong>ConS</strong> = {item.kS}</Typography>
+                                            <Typography><strong>Con</strong> = {item.k}</Typography>
 
                                             {item.customKValues && (
                                                 <Box mt={1}>
@@ -482,7 +546,7 @@ const ResultsPage = () => {
                             <TableRow>
                                 <TableCell>Позиция</TableCell>
                                 <TableCell>ФХП</TableCell>
-                                <TableCell align="right">Z</TableCell>
+                                <TableCell align="right">R</TableCell>
                                 <TableCell align="right">N</TableCell>
                                 <TableCell align="right">t</TableCell>
                                 <TableCell align="right">k</TableCell>

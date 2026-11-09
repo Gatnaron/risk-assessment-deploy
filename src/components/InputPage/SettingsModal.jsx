@@ -140,7 +140,7 @@ const SettingsModal = ({ open, onClose, settings, onSave }) => {
                         {Array.isArray(currentSettings.probabilityCriteria) && currentSettings.probabilityCriteria.map((criterion, index) => (
                             <Accordion key={criterion.id || index}>
                                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                    <Typography>Критерий {criterion.id || `X${index + 1}`}</Typography>
+                                    <Typography>Критерий {`P${index + 1}`}</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <TextField
@@ -165,7 +165,7 @@ const SettingsModal = ({ open, onClose, settings, onSave }) => {
                         {Array.isArray(currentSettings.consequenceCriteria) && currentSettings.consequenceCriteria.map((criterion, index) => (
                             <Accordion key={criterion.id || index}>
                                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                    <Typography>Критерий {criterion.id || `Y${index + 1}`}</Typography>
+                                    <Typography>Критерий {`C${index + 1}`}</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <TextField
@@ -190,7 +190,7 @@ const SettingsModal = ({ open, onClose, settings, onSave }) => {
                         {Array.isArray(currentSettings.complexityCriteria) && currentSettings.complexityCriteria.map((criterion, index) => (
                             <Accordion key={criterion.id || index}>
                                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                    <Typography>Критерий {criterion.id || `k${index + 1}`}</Typography>
+                                    <Typography>Критерий {`Con${index + 1}`}</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <TextField

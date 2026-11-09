@@ -45,19 +45,19 @@ export const calculateKS = (fhps) => {
 // Коэффициент сложности (k) с учетом пользовательских значений
 export const calculateKWithCustomValues = (kS, customKValues) => {
     // Проверяем, что kS находится в допустимом диапазоне
-    if (kS < 7 || kS > 21) {
+    if (kS < 0 || kS > 21) {
         return null;
     }
 
     if (customKValues) {
-        if (kS >= 7 && kS <= 11) return customKValues.range1;
-        if (kS >= 12 && kS <= 16) return customKValues.range2;
-        if (kS >= 17 && kS <= 21) return customKValues.range3;
+        if (kS >= 0 && kS <= 7) return customKValues.range1;
+        if (kS >= 8 && kS <= 14) return customKValues.range2;
+        if (kS >= 15 && kS <= 21) return customKValues.range3;
     }
 
     // Стандартные значения, если пользовательские не заданы
-    if (kS >= 7 && kS <= 11) return 1;
-    if (kS >= 12 && kS <= 16) return 1.25;
+    if (kS >= 0 && kS <= 7) return 1;
+    if (kS >= 8 && kS <= 14) return 1.25;
     return 1.5;
 };
 

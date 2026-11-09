@@ -6,15 +6,103 @@ import SettingsModal from './SettingsModal';
 import {Button, Container, Paper, Typography, Box} from '@mui/material';
 import { safeLocalStorage } from '../../utils/localStorage';
 import { defaultSettings } from '../../utils/settings';
+import { useRef } from 'react';
 
 const InputPage = () => {
     const navigate = useNavigate();
+    const settingsInputRef = useRef(null);
+    const dataInputRef = useRef(null);
 
     // Загрузка настроек из localStorage или использование стандартных
     const [settings, setSettings] = useState(() => {
         const savedSettings = safeLocalStorage.getItem('appSettings');
         return savedSettings ? JSON.parse(savedSettings) : { ...defaultSettings };
     });
+
+    // Экспорт настроек в файл
+    const exportSettings = () => {
+        const dataStr = JSON.stringify(settings, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `настройки_ФХП_${new Date().toISOString().slice(0, 10)}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
+
+    // Экспорт введенных данных в файл
+    const exportData = () => {
+        const data = {
+            orgParams,
+            fhps,
+            fhpTitles
+        };
+        const dataStr = JSON.stringify(data, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `данные_ФХП_${new Date().toISOString().slice(0, 10)}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
+
+    // Импорт настроек из файла
+    const importSettings = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (window.confirm('Импорт настроек заменит текущие настройки. Продолжить?')) {
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                try {
+                    const importedSettings = JSON.parse(e.target.result);
+                    // Проверка структуры
+                    if (importedSettings.probabilityCriteria &&
+                        importedSettings.consequenceCriteria &&
+                        importedSettings.complexityCriteria &&
+                        importedSettings.orgParams) {
+                        setSettings(importedSettings);
+                        alert('Настройки успешно импортированы!');
+                    } else {
+                        alert('Неверный формат файла настроек');
+                    }
+                } catch (error) {
+                    alert('Ошибка при чтении файла: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+        event.target.value = '';
+    };
+
+    // Импорт данных из файла
+    const importData = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                // Проверка структуры
+                if (importedData.orgParams && importedData.fhps && importedData.fhpTitles) {
+                    setOrgParams(importedData.orgParams);
+                    setFhps(importedData.fhps);
+                    setFhpTitles(importedData.fhpTitles);
+                    alert('Данные успешно импортированы!');
+                } else {
+                    alert('Неверный формат файла данных');
+                }
+            } catch (error) {
+                alert('Ошибка при чтении файла: ' + error.message);
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    };
 
     // Начальные параметры организации
     const initialOrgParams = {};
@@ -38,7 +126,7 @@ const InputPage = () => {
 
         // Добавляем k критерии
         settings.complexityCriteria.forEach(criterion => {
-            fhp[criterion.id] = 1;
+            fhp[criterion.id] = 0;
         });
 
         // Добавляем usedSettings с текущими настройками
@@ -124,7 +212,7 @@ const InputPage = () => {
                 });
             } else {
                 ['k1','k2','k3','k4','k5','k6','k7'].forEach(key => {
-                    fhp[key] = 1;
+                    fhp[key] = 0;
                 });
             }
 
@@ -325,6 +413,55 @@ const InputPage = () => {
                             onClick={handleClearMemory}
                         >
                             Очистить память
+                        </Button>
+                    </Box>
+                </Box>
+
+                {/* Блок экспорта/импорта */}
+                <Box sx={{ mb: 3, p: 2, bgcolor: '#f5f5f5', borderRadius: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                        Экспорт и импорт данных
+                    </Typography>
+                    <Box display="flex" gap={2} flexWrap="wrap">
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={exportSettings}
+                        >
+                            Скачать настройки
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={exportData}
+                        >
+                            Скачать данные
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            component="label"
+                        >
+                            Загрузить настройки
+                            <input
+                                ref={settingsInputRef}
+                                type="file"
+                                hidden
+                                accept=".json"
+                                onChange={importSettings}
+                            />
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            component="label"
+                        >
+                            Загрузить данные
+                            <input
+                                ref={dataInputRef}
+                                type="file"
+                                hidden
+                                accept=".json"
+                                onChange={importData}
+                            />
                         </Button>
                     </Box>
                 </Box>

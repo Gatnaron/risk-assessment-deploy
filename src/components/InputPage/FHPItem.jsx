@@ -11,19 +11,19 @@ const FHPItem = ({ fhp, title, onEdit, onDelete, index, settings }) => {
     const kS = calculateKS([fhp])[0];
 
     const calculateK = (kS, customKValues) => {
-        if (kS < 7 || kS > 21) {
+        if (kS < 0 || kS > 21) {
             return null;
         }
 
         if (customKValues) {
-            if (kS >= 7 && kS <= 11) return customKValues.range1;
-            if (kS >= 12 && kS <= 16) return customKValues.range2;
-            if (kS >= 17 && kS <= 21) return customKValues.range3;
+            if (kS >= 0 && kS <= 7) return customKValues.range1;
+            if (kS >= 8 && kS <= 14) return customKValues.range2;
+            if (kS >= 15 && kS <= 21) return customKValues.range3;
         }
 
         // Стандартные значения, если пользовательские не заданы
-        if (kS >= 7 && kS <= 11) return 1;
-        if (kS >= 12 && kS <= 16) return 1.25;
+        if (kS >= 0 && kS <= 7) return 1;
+        if (kS >= 8 && kS <= 14) return 1.25;
         return 1.5;
     };
 
@@ -69,27 +69,27 @@ const FHPItem = ({ fhp, title, onEdit, onDelete, index, settings }) => {
                 </Box>
 
                 <Box display="flex" justifyContent="space-between" mb={1}>
-                    <Typography variant="body2">Вероятность нарушений (XS):</Typography>
+                    <Typography variant="body2">Вероятность нарушений (PS):</Typography>
                     <Typography variant="body2">{xs.toFixed(2)}</Typography>
                 </Box>
 
                 <Box display="flex" justifyContent="space-between" mb={1}>
-                    <Typography variant="body2">Последствия нарушений (YS):</Typography>
+                    <Typography variant="body2">Последствия нарушений (CS):</Typography>
                     <Typography variant="body2">{ys.toFixed(2)}</Typography>
                 </Box>
 
                 <Box display="flex" justifyContent="space-between" mb={1}>
-                    <Typography variant="body2">Сложность проверки (kS):</Typography>
+                    <Typography variant="body2">Сложность проверки (ConS):</Typography>
                     <Typography
                         variant="body2"
-                        sx={{ color: kS >= 7 && kS <= 21 ? 'inherit' : 'error.main' }}
+                        sx={{ color: kS >= 0 && kS <= 21 ? 'inherit' : 'error.main' }}
                     >
                         {kS}
                     </Typography>
                 </Box>
 
                 <Box display="flex" justifyContent="space-between" mb={1}>
-                    <Typography variant="body2">Коэффициент сложности (k):</Typography>
+                    <Typography variant="body2">Коэффициент сложности (Con):</Typography>
                     <Typography variant="body2">{k !== null ? k : 'Ошибка'}</Typography>
                 </Box>
             </CardContent>

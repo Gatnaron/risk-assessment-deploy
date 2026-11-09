@@ -2,7 +2,7 @@ export const defaultSettings = {
     probabilityCriteria: [
         {
             id: 'X1',
-            name: 'X1',
+            name: 'P1',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -12,7 +12,7 @@ export const defaultSettings = {
         },
         {
             id: 'X2',
-            name: 'X2',
+            name: 'P2',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -22,7 +22,7 @@ export const defaultSettings = {
         },
         {
             id: 'X3',
-            name: 'X3',
+            name: 'P3',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -32,7 +32,7 @@ export const defaultSettings = {
         },
         {
             id: 'X4',
-            name: 'X4',
+            name: 'P4',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -42,7 +42,7 @@ export const defaultSettings = {
         },
         {
             id: 'X5',
-            name: 'X5',
+            name: 'P5',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -52,7 +52,7 @@ export const defaultSettings = {
         },
         {
             id: 'X6',
-            name: 'X6',
+            name: 'P6',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -62,7 +62,7 @@ export const defaultSettings = {
         },
         {
             id: 'X7',
-            name: 'X7',
+            name: 'P7',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -72,7 +72,7 @@ export const defaultSettings = {
         },
         {
             id: 'X8',
-            name: 'X8',
+            name: 'P8',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -85,7 +85,7 @@ export const defaultSettings = {
     consequenceCriteria: [
         {
             id: 'Y1',
-            name: 'Y1',
+            name: 'C1',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -95,7 +95,7 @@ export const defaultSettings = {
         },
         {
             id: 'Y2',
-            name: 'Y2',
+            name: 'C2',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -105,7 +105,7 @@ export const defaultSettings = {
         },
         {
             id: 'Y3',
-            name: 'Y3',
+            name: 'C3',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -115,7 +115,7 @@ export const defaultSettings = {
         },
         {
             id: 'Y4',
-            name: 'Y4',
+            name: 'C4',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -125,7 +125,7 @@ export const defaultSettings = {
         },
         {
             id: 'Y5',
-            name: 'Y5',
+            name: 'C5',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -135,7 +135,7 @@ export const defaultSettings = {
         },
         {
             id: 'Y6',
-            name: 'Y6',
+            name: 'C6',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -145,7 +145,7 @@ export const defaultSettings = {
         },
         {
             id: 'Y7',
-            name: 'Y7',
+            name: 'C7',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -155,7 +155,7 @@ export const defaultSettings = {
         },
         {
             id: 'Y8',
-            name: 'Y8',
+            name: 'C8',
             options: [
                 { value: 0, label: 'малозначимый' },
                 { value: 1, label: 'низкий' },
@@ -168,63 +168,63 @@ export const defaultSettings = {
     complexityCriteria: [
         {
             id: 'k1',
-            name: 'k1',
+            name: 'Con1',
             options: [
-                { value: 1, label: 'стандартный' },
+                { value: 0, label: 'стандартный' },
                 { value: 2, label: 'повышенный' },
                 { value: 3, label: 'высокий' }
             ]
         },
         {
             id: 'k2',
-            name: 'k2',
+            name: 'Con2',
             options: [
-                { value: 1, label: 'стандартный' },
+                { value: 0, label: 'стандартный' },
                 { value: 2, label: 'повышенный' },
                 { value: 3, label: 'высокий' }
             ]
         },
         {
             id: 'k3',
-            name: 'k3',
+            name: 'Con3',
             options: [
-                { value: 1, label: 'стандартный' },
+                { value: 0, label: 'стандартный' },
                 { value: 2, label: 'повышенный' },
                 { value: 3, label: 'высокий' }
             ]
         },
         {
             id: 'k4',
-            name: 'k4',
+            name: 'Con4',
             options: [
-                { value: 1, label: 'стандартный' },
+                { value: 0, label: 'стандартный' },
                 { value: 2, label: 'повышенный' },
                 { value: 3, label: 'высокий' }
             ]
         },
         {
             id: 'k5',
-            name: 'k5',
+            name: 'Con5',
             options: [
-                { value: 1, label: 'стандартный' },
+                { value: 0, label: 'стандартный' },
                 { value: 2, label: 'повышенный' },
                 { value: 3, label: 'высокий' }
             ]
         },
         {
             id: 'k6',
-            name: 'k6',
+            name: 'Con6',
             options: [
-                { value: 1, label: 'стандартный' },
+                { value: 0, label: 'стандартный' },
                 { value: 2, label: 'повышенный' },
                 { value: 3, label: 'высокий' }
             ]
         },
         {
             id: 'k7',
-            name: 'k7',
+            name: 'Con7',
             options: [
-                { value: 1, label: 'стандартный' },
+                { value: 0, label: 'стандартный' },
                 { value: 2, label: 'повышенный' },
                 { value: 3, label: 'высокий' }
             ]

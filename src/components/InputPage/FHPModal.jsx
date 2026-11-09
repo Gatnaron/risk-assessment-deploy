@@ -14,9 +14,9 @@ import { calculateKS } from '../../utils/calculations';
 import { defaultSettings } from '../../utils/settings';
 
 const calculateKFromKS = (kS, values) => {
-    if (kS >= 7 && kS <= 11) return values.range1;
-    if (kS >= 12 && kS <= 16) return values.range2;
-    if (kS >= 17 && kS <= 21) return values.range3;
+    if (kS >= 0 && kS <= 7) return values.range1;
+    if (kS >= 8 && kS <= 14) return values.range2;
+    if (kS >= 15 && kS <= 21) return values.range3;
 
     return null;
 };
@@ -144,8 +144,8 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
     };
 
     const handleSave = () => {
-        if (kS < 7 || kS > 21) {
-            setError(`Значение kS (${kS}) должно быть в диапазоне от 7 до 21`);
+        if (kS < 0 || kS > 21) {
+            setError(`Значение ConS (${kS}) должно быть в диапазоне от 0 до 21`);
             setShowError(true);
 
             // Скрываем сообщение об ошибке через 5 секунд
@@ -216,22 +216,24 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
 
 
                 <div className="modal-criteria">
-                    {['X', 'Y'].map(prefix => (
-                        <div key={prefix}>
-                            <h3>{prefix === 'X' ? 'Критерии вероятности нарушений' : 'Критерии последствий нарушений'} ({prefix}1-{prefix}8)</h3>
+                    {[
+                        { logic: 'X', display: 'P', type: 'probabilityCriteria', title: 'Критерии вероятности нарушений' },
+                        { logic: 'Y', display: 'C', type: 'consequenceCriteria', title: 'Критерии последствий нарушений' }
+                    ].map(({logic, display, type, title})  => (
+                        <div key={logic}>
+                            <h3>{title} ({display}1-{display}8)</h3>
                             <div className="criteria-grid">
                                 {Array.from({ length: 8 }).map((_, i) => {
-                                    const key = `${prefix}${i + 1}`;
-                                    // Используем ТЕКУЩИЕ настройки напрямую, как для k критериев
-                                    const criteriaType = prefix === 'X' ? 'probabilityCriteria' : 'consequenceCriteria';
-                                    const criterion = settings && settings[criteriaType] &&
-                                    Array.isArray(settings[criteriaType]) &&
-                                    settings[criteriaType][i] &&
-                                    settings[criteriaType][i].name &&
-                                    Array.isArray(settings[criteriaType][i].options)
-                                        ? settings[criteriaType][i]
+                                    const key = `${logic}${i + 1}`;
+
+                                    const criterion = settings && settings[type] &&
+                                    Array.isArray(settings[type]) &&
+                                    settings[type][i] &&
+                                    settings[type][i].name &&
+                                    Array.isArray(settings[type][i].options)
+                                        ? settings[type][i]
                                         : {
-                                            name: key,
+                                            name: key.replace('X', 'P').replace('Y', 'C'),
                                             options: [
                                                 { value: 0, label: 'малозначимый' },
                                                 { value: 1, label: 'низкий' },
@@ -261,7 +263,7 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
                         </div>
                     ))}
 
-                    <h3>Факторы сложности (k1-k7)</h3>
+                    <h3>Факторы сложности (Con1-Con7)</h3>
                     <div className="criteria-grid">
                         {Array.from({ length: 7 }).map((_, i) => {
                             const key = `k${i + 1}`;
@@ -273,7 +275,7 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
                                 : {
                                     name: key,
                                     options: [
-                                        { value: 1, label: 'стандартный' },
+                                        { value: 0, label: 'стандартный' },
                                         { value: 2, label: 'повышенный' },
                                         { value: 3, label: 'высокий' }
                                     ]
@@ -298,11 +300,11 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
                     </div>
 
                     <div className="k-calculation" style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
-                        <h3>Коэффициент сложности (k)</h3>
+                        <h3>Коэффициент сложности (Con)</h3>
                         <p style={{ color: isKSValid ? 'inherit' : 'error.main' }}>
-                            Интегральный показатель сложности (kS): <strong>{kS}</strong>
+                            Интегральный показатель сложности (ConS): <strong>{kS}</strong>
                         </p>
-                        <p>Текущее значение k: <strong>{k}</strong></p>
+                        <p>Текущее значение Con: <strong>{k}</strong></p>
 
                         <div style={{
                             display: 'grid',
@@ -311,37 +313,37 @@ const FHPModal = ({ open, onClose, fhp, onSave, onDelete, title, settings = defa
                             marginTop: '15px'
                         }}>
                             <TextField
-                                label="Значение для 7-11"
+                                label="Значение для 0-7"
                                 type="text"
                                 value={inputValues.range1}
                                 onChange={(e) => handleKValueChange('range1', e.target.value)}
                                 InputLabelProps={{ shrink: true }}
-                                helperText="Диапазон 7 ≤ kS ≤ 11"
+                                helperText="Диапазон 0 ≤ ConS ≤ 7"
                             />
                             <TextField
-                                label="Значение для 12-16"
+                                label="Значение для 8-14"
                                 type="text"
                                 value={inputValues.range2}
                                 onChange={(e) => handleKValueChange('range2', e.target.value)}
                                 InputLabelProps={{ shrink: true }}
-                                helperText="Диапазон 12 ≤ kS ≤ 16"
+                                helperText="Диапазон 8 ≤ ConS ≤ 14"
                             />
                             <TextField
-                                label="Значение для 17-21"
+                                label="Значение для 15-21"
                                 type="text"
                                 value={inputValues.range3}
                                 onChange={(e) => handleKValueChange('range3', e.target.value)}
                                 InputLabelProps={{ shrink: true }}
-                                helperText="Диапазон 17 ≤ kS ≤ 21"
+                                helperText="Диапазон 15 ≤ ConS ≤ 21"
                             />
                         </div>
 
                         <div style={{ marginTop: '15px', fontSize: '0.9rem', color: '#666' }}>
                             <p><strong>Правила определения k:</strong></p>
                             <ul>
-                                <li style={{ color: kS >= 7 && kS <= 11 ? 'inherit' : '#666' }}>Если 7 ≤ kS ≤ 11, то k = {kValues.range1 === '' ? '—' : kValues.range1}</li>
-                                <li style={{ color: kS >= 12 && kS <= 16 ? 'inherit' : '#666' }}>Если 12 ≤ kS ≤ 16, то k = {kValues.range2 === '' ? '—' : kValues.range2}</li>
-                                <li style={{ color: kS >= 17 && kS <= 21 ? 'inherit' : '#666' }}>Если 17 ≤ kS ≤ 21, то k = {kValues.range3 === '' ? '—' : kValues.range3}</li>
+                                <li style={{ color: kS >= 0 && kS <= 7 ? 'inherit' : '#666' }}>Если 0 ≤ ConS ≤ 7, то k = {kValues.range1 === '' ? '—' : kValues.range1}</li>
+                                <li style={{ color: kS >= 8 && kS <= 14 ? 'inherit' : '#666' }}>Если 8 ≤ ConS ≤ 14, то k = {kValues.range2 === '' ? '—' : kValues.range2}</li>
+                                <li style={{ color: kS >= 15 && kS <= 21 ? 'inherit' : '#666' }}>Если 15 ≤ ConS ≤ 21, то k = {kValues.range3 === '' ? '—' : kValues.range3}</li>
                             </ul>
                         </div>
                     </div>
